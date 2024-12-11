@@ -6,17 +6,42 @@ return {
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
   },
   config = function()
-    vim.keymap.set("n", "<space>sf", require('telescope.builtin').find_files)
+    local telescope = require('telescope')
+    local telescope_builtin = require('telescope.builtin')
+
+    telescope.setup {
+
+      theme = "ivy",
+      pickers = {
+        find_files = {
+          theme = "ivy"
+        }
+      },
+      extensions = {
+        fzf = {}
+      }
+    }
+
+    telescope.load_extension("fzf")
+
+    vim.keymap.set("n", "<space>sf", telescope_builtin.find_files)
     vim.keymap.set("n", "<space>en", function()
-      require('telescope.builtin').find_files {
+      telescope_builtin.find_files {
         cwd = vim.fn.stdpath("config")
       }
     end
     )
-    vim.keymap.set("n", "<space>ss", require('telescope.builtin').spell_suggest)
-    vim.keymap.set("n", "<space>sb", require('telescope.builtin').buffers)
-    vim.keymap.set("n", "<space>sh", require('telescope.builtin').help_tags)
-    vim.keymap.set("n", "<space>sg", require('telescope.builtin').live_grep)
-    vim.keymap.set("n", "<space>sr", require('telescope.builtin').lsp_refferences)
+    vim.keymap.set("n", "<space>sp", function()
+      telescope_builtin.find_files {
+        cwd = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy")
+      }
+    end
+    )
+    vim.keymap.set("n", "<space>ss", telescope_builtin.spell_suggest)
+    vim.keymap.set("n", "<space>sb", telescope_builtin.buffers)
+    vim.keymap.set("n", "<space>sh", telescope_builtin.help_tags)
+    require "config.plugins.telescope.multigrep".setup()
+    vim.keymap.set("n", "<space>sr", telescope_builtin.lsp_references)
   end
+
 }
